@@ -20,8 +20,13 @@ var User = db.define('user', {
 User.sync();
 
 exports.getUser = function() {
-	return User.sync()
-		.then(function() {
-			return User.findAll();
-		});
+	return User.findAll();
 };
+
+exports.userSignIn = function() {
+
+}
+
+exports.userLogIn = function() {
+  
+}
