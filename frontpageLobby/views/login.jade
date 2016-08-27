@@ -22,10 +22,7 @@ block content
 
     script.
         var token = utils.getCookie('token');
-        if(token)
-            window.location.href = '/';
-        else
-            console.log('Not logged in. token: ' + token);
+        console.log('token: ' + token);
 
         $('#submit').click(function() {
             $.ajax({
@@ -41,6 +38,7 @@ block content
                             backdrop: true
                         });
                     } else {
+                        utils.setCookie('token', result.token, 100);
                         window.location.href = '/';
                     }
                 }

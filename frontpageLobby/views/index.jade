@@ -26,11 +26,7 @@ block content
         var content = document.getElementById("content");
         var socket = io.connect('http://localhost:3000');
         socket.on('message', function (data) {
-            if(data.message) {
-                newMessage(data.message);
-            } else {
-                console.log("There is a problem:", data);
-            }
+            newMessage(data.content);
         });
 
     script.
@@ -41,7 +37,7 @@ block content
 
         // Page logic control
         function logout() {
-            setCookie('token', '', 100);
+            utils.setCookie('token', '', 100);
             window.location.href = '/login';
         }
 
@@ -62,7 +58,8 @@ block content
                             backdrop: true
                         });
                     } else {
-                        newMessage(content);
+                        // new message should from the server dynamically
+                        // newMessage(content);
                     }
                 }
             })

@@ -2,6 +2,7 @@
 var s = require('sequelize');
 var db = require('../db');
 var User = require('./user');
+var chatServer = require('../../chatServer.js');
 
 var Message = db.define('message', {
     id: {
@@ -54,14 +55,13 @@ exports.postMsg = function(params) {
     var token = params.token;
     var content = params.content;
     return User.getUserByToken(token).then(function(user) {
-        console.log(user);
         if(!user)
             return {error: 'You are not logged in.'};
         var msg = {
             userId: user.id,
             content: content,
         };
-        console.log(msg);
+        chatServer.io.emit('message', msg);
         return Message.create(msg);
     });
 }

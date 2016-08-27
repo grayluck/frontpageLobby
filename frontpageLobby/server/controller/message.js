@@ -12,7 +12,5 @@ exports.getMsg = function(req, res) {
 	model.message.getMsg()
 		.then(function(results) {
 			res.status(200).json(results);
-		}).catch(function(error) {
-			res.status(200).json({error: error});
 		});
 }
