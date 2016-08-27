@@ -16,6 +16,7 @@ exports.userSignIn = function(req, res) {
 }
 
 exports.userLogIn = function(req, res) {
+	console.log('user logging in: ' + req.body.username);
 	model.user.logIn(req.body)
 		.then(function(results) {
 			res.status(200).json(results);

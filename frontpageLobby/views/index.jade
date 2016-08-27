@@ -1,23 +1,25 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  #content Message should come out here
-  script(src='/socket.io/socket.io.js')
-  script.
-    var messages = [];
-    var content = document.getElementById("content");
-    var socket = io.connect('http://localhost:3000');
-    socket.on('message', function (data) {
-        if(data.message) {
-            messages.push(data.message);
-            var html = '';
-            for(var i=0; i<messages.length; i++) {
-                html += messages[i] + '<br />';
+    h1= title
+    p Welcome to #{title}
+    #content Message should come out here
+    script(src='/socket.io/socket.io.js')
+    script.
+        var messages = [];
+        var content = document.getElementById("content");
+        var socket = io.connect('http://localhost:3000');
+        /*
+        socket.on('message', function (data) {
+            if(data.message) {
+                messages.push(data.message);
+                var html = '';
+                for(var i=0; i<messages.length; i++) {
+                    html += messages[i] + '<br />';
+                }
+                content.innerHTML = html;
+            } else {
+                console.log("There is a problem:", data);
             }
-            content.innerHTML = html;
-        } else {
-            console.log("There is a problem:", data);
-        }
-    });
+        });
+        */
