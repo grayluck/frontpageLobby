@@ -9,13 +9,21 @@ var User = db.define('user', {
     id: {
         type: s.INTEGER,
         primaryKey: true,
-        autoIncrement: true // Automatically gets converted to SERIAL for postgres
+        autoIncrement: true
     },
     username: s.STRING,
     token: s.STRING,
     password: s.STRING
 }, {
-    freezeTableName: true
+    freezeTableName: true,
+    instanceMethods: {
+        toJSON: function () {
+            // omit password before return
+            var values = this.get();
+            delete values.password;
+            return values;
+        }
+      }
 });
 
 User.sync();
@@ -37,5 +45,5 @@ exports.signIn = function(params) {
 }
 
 exports.logIn = function(params) {
-  
+
 }
