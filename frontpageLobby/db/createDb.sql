@@ -15,7 +15,7 @@ CREATE TABLE `user` (
 
 CREATE TABLE `message` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `user` int NOT NULL,
+  `userId` int NOT NULL,
   `content` varchar(256),
   `time` DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(user) REFERENCES user(id) ON UPDATE CASCADE ON DELETE RESTRICT,

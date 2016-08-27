@@ -28,7 +28,7 @@ var User = db.define('user', {
     */
 });
 
-User.sync();
+exports.model = User;
 
 exports.getUser = function() {
 	return User.findAll();

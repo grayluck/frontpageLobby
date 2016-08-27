@@ -9,7 +9,7 @@ var Message = db.define('message', {
     primaryKey: true,
     autoIncrement: true // Automatically gets converted to SERIAL for postgres
     },
-    user: s.INTEGER,
+    // user: s.INTEGER,
     content: s.STRING(256),
     time: {
         type: s.DATE,
@@ -19,20 +19,46 @@ var Message = db.define('message', {
     freezeTableName: true
 });
 
-Message.sync();
+Message.belongsTo(User.model, {foreignKey:'userId'});
+
+User.model.sync().then(function(){
+    Message.sync()
+});
 
 exports.getMsg = function() {
-    return Message.findAll();
+    return Message.findAll({
+        attributes:[
+            'content', 
+            'time'
+        ],
+        include:[{
+            model: User.model,
+            attributes: [
+                'username'
+            ]
+        }]
+    }).then(function(res){
+        var ret = [];
+        for(var i = 0; i < res.length; ++i) {
+            ret.push({
+                content: res[i].content,
+                time: res[i].time,
+                username: res[i].user.username
+            });
+        }
+        return ret;
+    });
 }
 
 exports.postMsg = function(params) {
     var token = params.token;
     var content = params.content;
     return User.getUserByToken(token).then(function(user) {
+        console.log(user);
         if(!user)
             return {error: 'You are not logged in.'};
         var msg = {
-            user: user.id,
+            userId: user.id,
             content: content,
         };
         console.log(msg);
