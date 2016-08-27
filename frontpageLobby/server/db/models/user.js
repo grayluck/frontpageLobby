@@ -16,6 +16,7 @@ var User = db.define('user', {
     password: s.STRING
 }, {
     freezeTableName: true,
+    /*
     instanceMethods: {
         toJSON: function () {
             // omit password before return
@@ -24,6 +25,7 @@ var User = db.define('user', {
             return values;
         }
       }
+    */
 });
 
 User.sync();
@@ -34,16 +36,60 @@ exports.getUser = function() {
 
 exports.signIn = function(params) {
     var username = params.username;
-    var password = params.password;
-    var token = utils.genToken(16);
+    var password = utils.toMd5(params.password);
+    var token = utils.genToken();
     return User
-        .create({
-            username: username, 
-            token: token,
-            password: password
+        .findOne({
+            where: {
+                username: username
+            }
+        })
+        .then(function(result) {
+            if(result) {
+                // user already exists
+                return {error: 'User already exists.'};
+            } else {
+                return User
+                    .create({
+                        username: username, 
+                        token: token,
+                        password: password
+                    })
+                    .then(function(result) {
+                        return {
+                            token: token,
+                            username: username
+                        };
+                    });
+            }
         });
 }
 
 exports.logIn = function(params) {
-
+    var username = params.username;
+    var password = utils.toMd5(params.password);
+    return User
+        .findOne({
+            where: {
+                username: username,
+                password: password
+            }
+        })
+        .then(function(result) {
+            if(result) {
+                var token = utils.genToken();
+                return User
+                    .update(
+                        {token: token}, 
+                        {where: {username: username}
+                    })
+                    .then(function(result){
+                        return {
+                            token: token, 
+                            username: username
+                        };
+                    });
+            } else
+                return {error: 'Incorrect username or password.'};
+        });
 }
