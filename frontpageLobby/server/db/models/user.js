@@ -11,9 +11,9 @@ var User = db.define('user', {
         primaryKey: true,
         autoIncrement: true
     },
-    username: s.STRING,
-    token: s.STRING,
-    password: s.STRING
+    username: s.STRING(50),
+    token: s.STRING(50),
+    password: s.STRING(50)
 }, {
     freezeTableName: true,
     /*
@@ -33,6 +33,12 @@ User.sync();
 exports.getUser = function() {
 	return User.findAll();
 };
+
+exports.getUserByToken = function(token) {
+    return User.findOne({
+        where: {token: token}
+    });
+}
 
 exports.signIn = function(params) {
     var username = params.username;
