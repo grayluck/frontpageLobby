@@ -1,22 +1,22 @@
 
 var model = require('../db/models');
 
-exports.getUsers = function(req, res, next) {
+exports.getUsers = function(req, res) {
 	model.user.getUser()
 		.then(function(results) {
 			res.status(200).json(results);
 		});
 }
 
-exports.userSignIn = function(req, res, next) {
-	model.user.signIn()
+exports.userSignIn = function(req, res) {
+	model.user.signIn(req.body)
 		.then(function(results) {
 			res.status(200).json(results);
 		});
 }
 
-exports.userLogIn = function(req, res, next) {
-	model.user.logIn()
+exports.userLogIn = function(req, res) {
+	model.user.logIn(req.body)
 		.then(function(results) {
 			res.status(200).json(results);
 		});
