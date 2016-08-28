@@ -15,16 +15,43 @@ block content
 
             label(for="inputPassword" class="sr-only") Password
             input(type="password" id="password" name="password" class="form-control" placeholder="Password" required)
+            .signinContainer
+                a(id="aSignIn" href="#") New user? Sign in here.
 
             div(class="btn btn-lg btn-primary btn-block" id='submit') Sign in
 
     +alert('alert', 'Login failed.')
 
+    .modal.fade.bd-example-modal-sm(id='dlgSignIn' tabindex="-1" role="dialog")
+        .modal-dialog.modal-sm(role="document")
+            .modal-content
+                .modal-header
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">New user sign in</h4>
+                .modal-body
+                    form
+                        .form-group.has-feedback(id="groupUsername")
+                            label(for="signUsername") Username
+                            input(type="text" class="form-control" id="signUsername" placeholder="Username")
+                            span(class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display: none" id="glyphUsername")
+                            span(id="usernameTaken" class="help-block" style="display:none") This username is taken.
+                        .form-group.has-feedback(id="groupPassword")
+                            label(for="signPassword") Password
+                            input(type="password" class="form-control" id="signPassword" placeholder="Password")
+                        .form-group.has-feedback(id="groupPasswordConfirm")
+                            label(for="signPasswordConfirm") Confirm Password
+                            input(type="password" class="form-control" id="signPasswordConfirm" placeholder="Confirm Password")
+                            span(class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display: none" id="glyphConfirm")
+                            span(id="confirmFailed" class="help-block" style="display:none") Password doesn't match.
+                .modal-footer
+                    button(type="button" class="btn btn-default" data-dismiss="modal") Cancel
+                    button(type="button" class="btn btn-primary" id="btSubmitSignIn") Sign In
+
     script.
         var token = utils.getCookie('token');
         console.log('token: ' + token);
 
-        $('#submit').click(function() {
+        function submitLogin() {
             $.ajax({
                 url: '/api/userLogIn',
                 type: 'POST',
@@ -46,5 +73,62 @@ block content
                     }
                 }
             });
-        });
+        }
 
+        $('#submit').click(submitLogin);
+
+        function onSignIn() {
+            $("#usernameTaken").attr('display', 'none');
+            $('#dlgSignIn').modal({
+                backdrop: true
+            });
+        }
+
+        function submitSignIn() {
+            var password = $("#signPassword").val();
+            var passwordConfirm = $("#signPasswordConfirm").val();
+            if(password != passwordConfirm) {
+                $("#confirmFailed").show();
+                $("#groupPasswordConfirm").addClass("has-error");
+                $("#glyphConfirm").show();
+                return;
+            }
+            $("#confirmFailed").hide();
+            $("#groupPasswordConfirm").removeClass("has-error");
+            $("#usernameTaken").hide();
+            $("#glyphConfirm").hide();
+            $("#glyphUsername").hide();
+            $("#groupUsername").removeClass("has-error");
+            $.ajax({
+                type: "POST",
+                url: '/api/userSignIn',
+                data: {
+                    username: $("#signUsername").val(),
+                    password: $("#signPassword").val()
+                },
+                success: function(data) {
+                    if(data.error) {
+                        $("#usernameTaken").show();
+                        $("#glyphUsername").show();
+                        $("#groupUsername").addClass("has-error");
+                    } else {
+                        utils.setCookie('token', data.token, 100);
+                        // the cookie username is only for display purpose
+                        // nothing to do with identification
+                        utils.setCookie('username', data.username, 100);
+                        window.location.href = '/';
+                    }
+                }
+            });
+        }
+
+        $("#aSignIn").click(onSignIn);
+
+        $("#btSubmitSignIn").click(submitSignIn);
+
+        $('#password').keydown(function (e) {
+            if (e.keyCode == 13) {
+                // Enter pressed
+                submitLogin();
+            }
+        });
