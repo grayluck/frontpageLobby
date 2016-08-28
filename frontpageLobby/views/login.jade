@@ -39,6 +39,9 @@ block content
                         });
                     } else {
                         utils.setCookie('token', result.token, 100);
+                        // the cookie username is only for display purpose
+                        // nothing to do with identification
+                        utils.setCookie('username', $('#username').val(), 100);
                         window.location.href = '/';
                     }
                 }

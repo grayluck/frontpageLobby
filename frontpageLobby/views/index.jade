@@ -1,24 +1,45 @@
 extends layout
 
-block content
-    h1= title
-    p Welcome to #{title}
-    #content Message should come out here
+block header    
+    link(
+        rel="stylesheet",
+        href="/stylesheets/chat.css")
 
-    button(id='testButton') test
+
+block content
+    .container
+        #bubbles.chat
+
+
+        h1= title
+        p Welcome to #{title}
+        #content Message should come out here
+
+        button(id='testButton') test
+
+    div(style='display:none')
+        #bubbleme.bubbleCover
+            #username
+            img(id="avatar")
+            .bubble.me
+        #bubbleyou.bubbleCover
+            .bubble.you
 
     +alert('alert', 'Please log in first.')
 
     script(src='/socket.io/socket.io.js')
     script.
-        var messages = [];
+        var username = utils.getCookie('username');
         function newMessage(msg) {
-            messages.push(msg);
-            var html = '';
-            for(var i=0; i<messages.length; i++) {
-                html += messages[i] + '<br />';
-            }
-            content.innerHTML = html;
+            var bubble;
+            //if(msg.username == username)
+            if(Math.random() < 0.5)
+                bubble = $('#bubbleme').clone();
+            else
+                bubble = $('#bubbleyou').clone();
+            bubble.find('.bubble').html(msg.content);
+            //$("#bubbles").append(bubble);
+            $(".container").append(bubble);
         }
 
     script.
@@ -26,7 +47,7 @@ block content
         var content = document.getElementById("content");
         var socket = io.connect('http://localhost:3000');
         socket.on('message', function (data) {
-            newMessage(data.content);
+            newMessage(data);
         });
 
     script.
@@ -72,7 +93,7 @@ block content
                 success: function(data) {
                     for(var i = 0; i < data.length; ++i) {
                         console.log(data[i]);
-                        newMessage(data[i].content);
+                        newMessage(data[i]);
                     }
                 }
             });
