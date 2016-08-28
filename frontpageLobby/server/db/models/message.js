@@ -4,6 +4,8 @@ var db = require('../db');
 var User = require('./user');
 var chatServer = require('../../chatServer.js');
 
+var moment = require('moment');
+
 var Message = db.define('message', {
     id: {
     type: s.INTEGER,
@@ -43,7 +45,7 @@ exports.getMsg = function() {
         for(var i = 0; i < res.length; ++i) {
             ret.push({
                 content: res[i].content,
-                time: res[i].time,
+                time: moment(res[i].time).format('YYYY-MM-DD HH:mm:ss'),
                 username: res[i].user.username
             });
         }
@@ -54,12 +56,16 @@ exports.getMsg = function() {
 exports.postMsg = function(params) {
     var token = params.token;
     var content = params.content;
+    if(content.length == 0)
+        return {error: 'The content cannot be empty.'};
     return User.getUserByToken(token).then(function(user) {
         if(!user)
             return {error: 'You are not logged in.'};
         var msg = {
             userId: user.id,
+            username: user.username,
             content: content,
+            time: moment().format('YYYY-MM-DD HH:mm:ss')
         };
         chatServer.io.emit('message', msg);
         return Message.create(msg);

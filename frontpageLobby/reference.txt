@@ -1,2 +1,4 @@
 http://jsfiddle.net/thinkingstiff/mek5z/
 login? forgot the origin
+avatar: jdenticon-1.3.2
+	js-md5: md5.min.js

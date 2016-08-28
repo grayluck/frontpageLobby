@@ -9,48 +9,61 @@ block header
 block content
     .container
         #bubbles.chat
-
-
-        h1= title
-        p Welcome to #{title}
-        #content Message should come out here
-
-        button(id='testButton') test
-
+        #inputPanel
+            .form-group
+                label(for="content" id="lLabel") Say something:
+                textarea(class="form-control" rows="5" id="inputContent" style="resize: none")
+                button(type="button" class="btn btn-default" id="btLogout") Log out
+                button(type="button" class="btn btn-primary" id="btPost" style="float: right") Post
     div(style='display:none')
         #bubbleme.bubbleCover
-            #username
-            img(id="avatar")
+            #avatarContainer
+                canvas(id="avatar")
             .bubble.me
+                span(class='bubbleAuthor')
+                span(class='bubbleDate')
+                hr
+                .bubbleContent
         #bubbleyou.bubbleCover
+            #avatarContainer
+                canvas(id="avatar")
             .bubble.you
-
+                span(class='bubbleAuthor')
+                span(class='bubbleDate')
+                hr
+                .bubbleContent
     +alert('alert', 'Please log in first.')
 
     script(src='/socket.io/socket.io.js')
+    script(src='/javascripts/md5.min.js')
+    script(src='/javascripts/jdenticon-1.3.2.min.js')
     script.
         var username = utils.getCookie('username');
+        $("#lLabel").html('Hi ' + username + ", say something:");
+
         function newMessage(msg) {
             var bubble;
-            //if(msg.username == username)
-            if(Math.random() < 0.5)
+            // if(Math.random() < 0.5)
+            if(msg.username == username)
                 bubble = $('#bubbleme').clone();
             else
                 bubble = $('#bubbleyou').clone();
-            bubble.find('.bubble').html(msg.content);
-            //$("#bubbles").append(bubble);
-            $(".container").append(bubble);
+            bubble.find('.bubbleContent').html(msg.content);
+            bubble.find('.bubbleAuthor').html(msg.username);
+            bubble.find('.bubbleDate').html(msg.time);
+            $(".chat").append(bubble);
+            bubble.find('#avatar')
+                .attr({"width": '40', "heigth": '40'})
+                .jdenticon(md5(msg.username));
+            $('#bubbles').scrollTop($('#bubbles').height());
         }
 
-    script.
         // Dealing with realtime connection
         var content = document.getElementById("content");
         var socket = io.connect('http://localhost:3000');
         socket.on('message', function (data) {
             newMessage(data);
         });
-
-    script.
 
         $('#alert').on('hidden.bs.modal', function () {
             window.location.href = '/login';
@@ -62,9 +75,11 @@ block content
             window.location.href = '/login';
         }
 
-        function postMessage() {
+        function postMessage(s) {
             var token = utils.getCookie('token');
-            var content = 'asdfaaa';
+            var content = s;
+            if(s.length == 0)
+                return;
             $.ajax({
                 url: '/api/postMsg',
                 method: 'POST',
@@ -101,6 +116,19 @@ block content
 
         getMessage();
 
-        $('#testButton').click(function(){
-            postMessage();
+        function sendMessage() {
+            postMessage($('#inputContent').val());
+            $('#inputContent').val('');
+        }
+
+        $('#inputContent').keydown(function (e) {
+            if (e.ctrlKey && e.keyCode == 13) {
+                // Ctrl-Enter pressed
+                sendMessage();
+            }
+        });
+
+        $('#btPost').click(sendMessage);
+        $('#btLogout').click(function() {
+            logout();
         });
