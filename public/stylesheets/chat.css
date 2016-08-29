@@ -141,3 +141,18 @@ body {
 									   color-stop(0.72, rgb(73,125,189)),
 									   color-stop(0.86, rgb(28,58,148)));
 }
+
+#bubbleNotify {
+    text-align: center;
+}
+
+#notification {
+    background-color: #F2F2F2;
+    border-radius: 10px;
+    display: inline-block;
+    padding: 5px 30px;
+    margin: 5px 5px;
+    position: relative;
+    vertical-align: top;
+    max-width: 70%;
+}

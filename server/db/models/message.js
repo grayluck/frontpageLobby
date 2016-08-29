@@ -39,7 +39,8 @@ exports.getMsg = function() {
             attributes: [
                 'username'
             ]
-        }]
+        }],
+        order: '`time` DESC'
     }).then(function(res){
         var ret = [];
         for(var i = 0; i < res.length; ++i) {

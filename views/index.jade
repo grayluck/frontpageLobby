@@ -38,6 +38,8 @@ block content
                 span(class='bubbleDate')
                 hr
                 .bubbleContent
+        #bubbleNotify
+            #notification
     
     +alert('alert', 'Please log in first.')
 
@@ -72,12 +74,39 @@ block content
             bubbles.scrollTop = bubbles.scrollHeight;
             // $('#bubbles').scrollTop($('#bubbles').scrollHeight);
         }
+        
+        function newNotification(msg) {
+            var bubble = $('#bubbleNotify').clone();
+            bubble.find("#notification").html(msg);
+            $(".chat").append(bubble);
+            var bubbles = document.getElementById('bubbles');
+            bubbles.scrollTop = bubbles.scrollHeight;
+        }
+        
+        function userJoins(user) {
+            newNotification(user + " has joined the lobby");
+        }
+        
+        function userLeaves(user) {
+            newNotification(user + " has left the lobby");
+        }
 
         // Dealing with realtime connection
         var content = document.getElementById("content");
         var socket = io.connect('http://localhost:3000');
+        socket.on('connect', function() {
+            socket.emit('login', username);
+        });
         socket.on('message', function (data) {
             newMessage(data);
+        });
+        socket.on('login', function(data) {
+            if(data == username)
+                return;
+            userJoins(data);
+        });
+        socket.on('leave', function(data) {
+            userLeaves(data);
         });
 
         $('#alert').on('hidden.bs.modal', function () {
