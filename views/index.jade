@@ -4,6 +4,10 @@ block header
     link(
         rel="stylesheet",
         href="/stylesheets/chat.css")
+    link(
+        rel="stylesheet"
+        href="font-awesome-4.6.3/css/font-awesome.min.css"
+    )
 
 
 block content
@@ -15,6 +19,8 @@ block content
                 textarea(class="form-control" rows="5" id="inputContent" style="resize: none")
                 button(type="button" class="btn btn-default" id="btLogout") Log out
                 button(type="button" class="btn btn-primary" id="btPost" style="float: right") Post
+                button(type="button" class="btn btn-primary" style="float: right" id="btMicro")
+                    <i class="fa fa-microphone" id="glyphMicro"></i>
     div(style='display:none')
         #bubbleme.bubbleCover
             #avatarContainer
@@ -32,12 +38,21 @@ block content
                 span(class='bubbleDate')
                 hr
                 .bubbleContent
+    
     +alert('alert', 'Please log in first.')
 
     script(src='/socket.io/socket.io.js')
     script(src='/javascripts/md5.min.js')
     script(src='/javascripts/jdenticon-1.3.2.min.js')
     script.
+        var recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.onresult = function(event) { 
+          console.log(event) 
+        }
+        recognition.start();
+    
         var username = utils.getCookie('username');
         var token = utils.getCookie('token');
 
@@ -140,3 +155,34 @@ block content
         $('#btLogout').click(function() {
             logout();
         });
+
+        if (!('webkitSpeechRecognition' in window))
+            $('#btMicro').addClass('disabled');
+        else {
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = "en-US";
+            recognition.onresult = function(event) { 
+                console.log(event);
+                var txt = event.results[0][0].transcript;
+                // var txt = "aaa";
+                $("#inputContent").val(txt);
+            }
+            var recording = false;
+            
+            $('#btMicro').click(function() {
+                if(!recording) {
+                    recording = true;
+                    $("#glyphMicro").removeClass("fa-microphone");
+                    $("#glyphMicro").addClass("fa-microphone-slash");
+                    recognition.start();
+                } else {
+                    recording = false;
+                    $("#glyphMicro").addClass("fa-microphone");
+                    $("#glyphMicro").removeClass("fa-microphone-slash");
+                    recognition.stop();
+                }
+            });
+        }
+        

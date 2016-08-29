@@ -24,3 +24,4 @@ login? forgot the origin
 avatar: jdenticon-1.3.2
 	js-md5: md5.min.js
 scroll-bar: https://codepen.io/GhostRider/pen/GHaFw
+microphone: http://fontawesome.io/get-started/
