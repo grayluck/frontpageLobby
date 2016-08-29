@@ -40,7 +40,7 @@ exports.getMsg = function() {
                 'username'
             ]
         }],
-        order: '`time` DESC'
+        order: '`time`'
     }).then(function(res){
         var ret = [];
         for(var i = 0; i < res.length; ++i) {

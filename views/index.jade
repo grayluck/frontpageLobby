@@ -159,10 +159,50 @@ block content
         }
 
         getMessage();
-
+        
+        if (!('webkitSpeechRecognition' in window))
+            $('#btMicro').addClass('disabled');
+        else {
+            var recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = "en-US";
+            recognition.onresult = function(event) { 
+                console.log(event);
+                var txt = '';
+                for(var i = 0; i < event.results.length; ++i) 
+                    txt += event.results[i][0].transcript;
+                // var txt = "aaa";
+                $("#inputContent").val(txt);
+            }
+            var recording = false;
+            
+            function stopVoice() {
+                recording = false;
+                $("#glyphMicro").addClass("fa-microphone");
+                $("#glyphMicro").removeClass("fa-microphone-slash");
+                recognition.stop();
+            }
+            
+            function startVoice() {
+                recording = true;
+                $("#glyphMicro").removeClass("fa-microphone");
+                $("#glyphMicro").addClass("fa-microphone-slash");
+                recognition.start();
+            }
+            
+            $('#btMicro').click(function() {
+                if(!recording) 
+                    startVoice();
+                else 
+                    stopVoice();
+            });
+        }
+        
         function sendMessage() {
             postMessage($('#inputContent').val());
             $('#inputContent').val('');
+            stopVoice();
         }
 
         $('#inputContent').keydown(function (e) {
@@ -176,34 +216,3 @@ block content
         $('#btLogout').click(function() {
             logout();
         });
-
-        if (!('webkitSpeechRecognition' in window))
-            $('#btMicro').addClass('disabled');
-        else {
-            var recognition = new webkitSpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = "en-US";
-            recognition.onresult = function(event) { 
-                console.log(event);
-                var txt = event.results[0][0].transcript;
-                // var txt = "aaa";
-                $("#inputContent").val(txt);
-            }
-            var recording = false;
-            
-            $('#btMicro').click(function() {
-                if(!recording) {
-                    recording = true;
-                    $("#glyphMicro").removeClass("fa-microphone");
-                    $("#glyphMicro").addClass("fa-microphone-slash");
-                    recognition.start();
-                } else {
-                    recording = false;
-                    $("#glyphMicro").addClass("fa-microphone");
-                    $("#glyphMicro").removeClass("fa-microphone-slash");
-                    recognition.stop();
-                }
-            });
-        }
-        

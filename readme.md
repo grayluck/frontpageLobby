@@ -3,11 +3,7 @@
 
 ## Introduction
 
-To be filled.
-
-## Dependencies
-
-To be filled.
+A instant messenger prototype system.
 
 ## Installation
 
@@ -20,7 +16,6 @@ To be filled.
 
 ### References
 http://jsfiddle.net/thinkingstiff/mek5z/
-login? forgot the origin
 avatar: jdenticon-1.3.2
 	js-md5: md5.min.js
 scroll-bar: https://codepen.io/GhostRider/pen/GHaFw
